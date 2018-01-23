@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">OpenGLDemo</string>
+
+    <string name="triangle">三角形</string>
+    <string name="texture">纹理绘制</string>
+
+    <string name="save">SavePicture</string>
+</resources>
