@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.meitu.beautiful.BeautifulCameraActivity;
+import com.meitu.camera.CameraActivity;
+import com.meitu.texture.TextureDemoActivity;
 
 /**
  * 工程主界面
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_beautiful_camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, BeautifulCameraActivity.class));
+                startActivity(BeautifulCameraActivity.class);
             }
         });
 
@@ -31,8 +33,31 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_animation).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, AnimationActivity.class));
+                startActivity(AnimationActivity.class);
             }
         });
+
+        // 点击进入纹理加载
+        findViewById(R.id.btn_texture).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(TextureDemoActivity.class);
+            }
+        });
+
+        findViewById(R.id.btn_camera).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(CameraActivity.class);
+            }
+        });
+    }
+
+    /**
+     * 跳转到目标Activity
+     * @param cls 目标Activity的class
+     */
+    private void startActivity(Class<?> cls) {
+        startActivity(new Intent(MainActivity.this, cls));
     }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.meitu.texture">
+
+    <application>
+        <activity
+            android:name=".TextureDemoActivity"
+            android:label="@string/title_activity_texture_demo"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+    </application>
+
+</manifest>

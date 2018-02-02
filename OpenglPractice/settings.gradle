@@ -1,1 +1,1 @@
-include ':app', ':animation', ':base', ':beautiful'
+include ':app', ':animation', ':base', ':beautiful', ':texture', ':camera'

@@ -12,6 +12,8 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/base" />
             <option value="$PROJECT_DIR$/beautiful" />
+            <option value="$PROJECT_DIR$/camera" />
+            <option value="$PROJECT_DIR$/texture" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

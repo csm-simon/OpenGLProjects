@@ -63,10 +63,10 @@ public class BeautifulFilter extends BaseFilter {
 
         // 根据句柄给对应的属性赋值
         vertexBuffer.position(0);
-        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, vertexBuffer);
+        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 12, vertexBuffer);
         GLES20.glEnableVertexAttribArray(mPositionHandle);
         texBuffer.position(0);
-        GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, texBuffer);
+        GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 8, texBuffer);
         GLES20.glEnableVertexAttribArray(mTextureHandle);
 
         setTexelSize(mSurfaceWidth, mSurfaceHeight);
@@ -79,6 +79,14 @@ public class BeautifulFilter extends BaseFilter {
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
     }
 
+    /**
+     * 绘制到FBO
+     *
+     * @param textureId    输入的纹理id
+     * @param vertexBuffer 顶点缓冲
+     * @param texBuffer    纹理缓冲
+     * @return 输出的纹理id
+     */
     public int onDrawToTexture(int textureId, FloatBuffer vertexBuffer, FloatBuffer texBuffer) {
         GLES20.glUseProgram(mProgram);
 
@@ -107,6 +115,11 @@ public class BeautifulFilter extends BaseFilter {
         return mFrameBufferTextures[0];
     }
 
+    /**
+     * 设置纹理的变换矩阵
+     *
+     * @param mtx 矩阵
+     */
     public void setTextureTransformMatrix(float[] mtx) {
         mTextureTransformMatrix = mtx;
     }

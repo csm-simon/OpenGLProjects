@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">texture</string>
+    <string name="title_activity_texture_demo">TextureDemoActivity</string>
+</resources>
