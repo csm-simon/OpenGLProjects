@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AgoraDemo</string>
+
+    <string name="main_button_gl_2_txt">Render in GLES 2</string>
+    <string name="main_button_gl_3_txt">Render in GLES 3</string>
+    <string name="gl_surface_switch_background_btn_txt">Switch background</string>
+    <string name="main_radio_btn_texture_activity">TextureView</string>
+    <string name="main_radio_btn_glsurface_activity">GLSurfaceView</string>
+</resources>
