@@ -10,6 +10,8 @@ import android.opengl.EGLSurface;
 import android.opengl.GLUtils;
 
 import com.demo.yujieliu.agorademo.Dog;
+import com.demo.yujieliu.agorademo.egl.EGLCore;
+import com.demo.yujieliu.agorademo.egl.EGLSurfaceConfig;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -44,10 +46,9 @@ public class GLThread extends Thread {
      */
     private RenderCallback mRenderCallback;
 
+    private EGLCore mEGLCore;
+
     private SurfaceTexture mSurfaceTexture;
-    private EGLContext mEGLContext;
-    private EGLDisplay mEGLDisplay;
-    private EGLSurface mEGLSurface;
     /**
      * 是否在请求绘制时才调用重新绘制
      *
@@ -70,72 +71,23 @@ public class GLThread extends Thread {
     }
 
     private void initGLEnvironment() {
-        // 获取EGLDisplay
-        mEGLDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
-        if (EGL14.EGL_NO_DISPLAY == mEGLDisplay) {
-            throwError("Get EGLDisplay failed: ");
-        }
-        int[] eglImplVersion = new int[2];
-        // 初始化EGLDisplay,并获取EGL实现的最大版本号和最小版本号
-        if (!EGL14.eglInitialize(mEGLDisplay, eglImplVersion, 0, eglImplVersion, 1)) {
-            throwError("Initialize EGLDisplay failed: ");
-        }
-        // 根据用到的OpenGLES版本，选择对应的EGL_RENDERABLE_TYPE的值，使得后续创建的EGLSurface中的FrameBuffer满足
-        // 我们所需的OpenGL ES版本的要求。
-        int eglVersionBit = mEGLContextClientVersion == 2 ? EGL14.EGL_OPENGL_ES2_BIT : EGLExt.EGL_OPENGL_ES3_BIT_KHR;
-        Dog.d(TAG, "EGL Context Client Version Bit: " + eglVersionBit + ", mEGLContextClientVersion: " + mEGLContextClientVersion);
-        // EGLConfig的属性值，这里指定了RGBA分别占8bits, 深度为0，surface类型为window(显示用的surface必须为window)
-        int[] configAttribs = {
-                EGL14.EGL_ALPHA_SIZE, 8,
-                EGL14.EGL_BLUE_SIZE, 8,
-                EGL14.EGL_GREEN_SIZE, 8,
-                EGL14.EGL_RED_SIZE, 8,
-                EGL14.EGL_DEPTH_SIZE, 0,
-                EGL14.EGL_RENDERABLE_TYPE, eglVersionBit,
-                EGL14.EGL_SURFACE_TYPE, EGL14.EGL_WINDOW_BIT,
-                EGL14.EGL_NONE
-        };
-        // 存储EGLConfig数目的数组
-        int[] numConfigs = new int[1];
-        // 存储获取到的EGLConfig的数组
-        EGLConfig[] configs = new EGLConfig[1];
-        // 将我们需要的EGLConfig属性列表传给EGLDisplay，让系统选择最接近我们需求的EGLConfig,存到configs里返回给我们。
-        // 符合的EGLConfig数量会保存在numConfigs中。
-        if (!EGL14.eglChooseConfig(mEGLDisplay, configAttribs, 0, configs,
-                0, 1, numConfigs, 0)) {
-            throwError("Choose EGLConfig failed: ");
-        }
-        queryEGLConfig(mEGLDisplay, configs[0]);
-        // EGLContext创建的属性，只需指定使用的EGLContext Client Version版本。
-        int[] contextAttribs = {
-                EGL14.EGL_CONTEXT_CLIENT_VERSION, mEGLContextClientVersion,
-                EGL14.EGL_NONE
-        };
-        // 用EGLDisplay, EGLConfig和EGLContext的父Context以及属性列表创建一个EGLContext.如果没有父Context,
-        // 传EGL_NO_CONTEXT即可。
-        mEGLContext = EGL14.eglCreateContext(mEGLDisplay, configs[0], EGL14.EGL_NO_CONTEXT, contextAttribs, 0);
-        // 指定EGLSurface的RenderBuffer为BACK_BUFFER,如果是离屏渲染的话，就用EGL_SINGLE_BUFFER
-        int[] surfaceAttribs = {
-                EGL14.EGL_RENDER_BUFFER, EGL14.EGL_BACK_BUFFER, EGL14.EGL_NONE
-        };
-        // 创建EGLSurface，由于要显示到屏幕上，所以要创建WindowSurface，要用到SurfaceTexture
-        mEGLSurface = EGL14.eglCreateWindowSurface(mEGLDisplay, configs[0], mSurfaceTexture, surfaceAttribs, 0);
-        // 检查是否创建EGLSurface或者EGLContext失败
-        if (EGL14.EGL_NO_SURFACE == mEGLSurface || EGL14.EGL_NO_CONTEXT == mEGLContext) {
-            int error = EGL14.eglGetError();
-            if (EGL14.EGL_BAD_NATIVE_WINDOW == error) {
-                throw new RuntimeException("eglCreateWindowSurface returned  EGL_BAD_NATIVE_WINDOW. ");
+        int flag = mEGLContextClientVersion >= 3 ? EGLCore.FLAG_PREFER_GLES3 : 0;
+        flag |= EGLCore.FLAG_RECORDABLE;
+        mEGLCore = EGLCore.createEGL(null, flag);
+
+        mEGLCore.createSurface(new EGLSurfaceConfig() {
+            @Override
+            public int chooseSurfaceType() {
+                return SurfaceType.WINDOW_SURFACE;
             }
-            throwError("eglCreateWindowSurface failed : ");
-        }
-        // 配置好GL环境
-        if (!EGL14.eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext)) {
-            throwError("eglMakeCurrent failed: ");
-        }
-        // 调试代码，查询EGLContext的client version
-        int[] eglContextClientVersion = new int[1];
-        EGL14.eglQueryContext(mEGLDisplay, mEGLContext, EGL14.EGL_CONTEXT_CLIENT_VERSION, eglContextClientVersion, 0);
-        Dog.i(TAG, "EGL context client version: " + eglContextClientVersion[0]);
+
+            @Override
+            public Object getNativeWindowForWindowSurface() {
+                return mSurfaceTexture;
+            }
+        });
+
+        mEGLCore.makeCurrent();
     }
 
     /**
@@ -176,7 +128,7 @@ public class GLThread extends Thread {
                 mRenderCallback.onDrawFrame();
             }
             // 将EGLSurface的FrameBuffer呈交到屏幕上
-            EGL14.eglSwapBuffers(mEGLDisplay, mEGLSurface);
+            mEGLCore.swapBuffers();
             if (mRenderWhenDirty) { // 如果是RenderWhenDirty8的话，就等待外部调用requestRender()
                 synchronized (mRenderLock) {
                     try {
@@ -211,11 +163,7 @@ public class GLThread extends Thread {
      * 释放EGL资源
      */
     private void destroyGLEnvironment() {
-        EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
-        mEGLContext = EGL14.EGL_NO_CONTEXT;
-        EGL14.eglDestroySurface(mEGLDisplay, mEGLSurface);
-        mEGLSurface = EGL14.EGL_NO_SURFACE;
-        mEGLDisplay = EGL14.EGL_NO_DISPLAY;
+        mEGLCore.release();
         mSurfaceTexture = null;
     }
 
