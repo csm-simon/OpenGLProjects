@@ -16,6 +16,7 @@ import static android.opengl.GLES20.glBindBuffer;
 import static android.opengl.GLES20.glBindTexture;
 import static android.opengl.GLES20.glBufferData;
 import static android.opengl.GLES20.glDeleteBuffers;
+import static android.opengl.GLES20.glDeleteProgram;
 import static android.opengl.GLES20.glDeleteTextures;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
@@ -96,6 +97,7 @@ public class GLProgram {
         mAttribTextureCoordinateLoc = glGetAttribLocation(mProgramHandle, "inputTextureCoordinate");
         mUniformTextureLoc = glGetUniformLocation(mProgramHandle, "inputImageTexture");
         mUniformMVPMatrixLoc = glGetUniformLocation(mProgramHandle, "mvpMatrix");
+        Matrix.setIdentityM(mMVPMatrix, 0);
     }
 
     public void onSurfaceChanged(int w, int h) {
@@ -134,6 +136,7 @@ public class GLProgram {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         // 纹理解绑
         glBindTexture(GL_TEXTURE_2D, 0);
+        glUseProgram(0);
     }
 
     public void putVertices(float[] vertices) {
@@ -175,7 +178,10 @@ public class GLProgram {
             glDeleteTextures(1, new int[]{mTextureId}, 0);
             mTextureId = OpenGLUtils.NO_TEXTURE;
         }
-        mProgramHandle = 0;
+        if (mProgramHandle != 0) {
+            glDeleteProgram(mProgramHandle);
+            mProgramHandle = 0;
+        }
     }
 
 }

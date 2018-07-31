@@ -1,6 +1,10 @@
 package com.demo.yujieliu.agorademo;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RadioButton;
@@ -9,6 +13,7 @@ import android.widget.Toast;
 import com.demo.yujieliu.agorademo.gl.OpenGLUtils;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final int CODE_REQUEST_PERMISSION = 1024;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +22,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         findViewById(R.id.opengl_2_btn).setOnClickListener(this);
         findViewById(R.id.opengl_3_btn).setOnClickListener(this);
+        requestPermission();
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CODE_REQUEST_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case CODE_REQUEST_PERMISSION:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    finish();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
