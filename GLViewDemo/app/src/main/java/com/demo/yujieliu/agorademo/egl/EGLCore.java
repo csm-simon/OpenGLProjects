@@ -40,7 +40,9 @@ public abstract class EGLCore<Context, Surface, Display, Config> {
     private static final int EGL_OPENGL_ES2_BIT = SUPPORT_EGL14 ? EGL14.EGL_OPENGL_ES2_BIT : 0x0004;
 
     private static final int EGL_NONE = SUPPORT_EGL14 ? EGL14.EGL_NONE : EGL10.EGL_NONE;
-
+    /**
+     * Android专用扩展，创建EGLConfig时如果传入该标志的话，EGL创建的Surface用的Buffer会与{@link android.media.MediaCodec}兼容
+     */
     private static final int EGL_RECORDABLE_ANDROID = 0x3142;
 
     public static final int FLAG_RECORDABLE = 0x01;
@@ -186,17 +188,29 @@ public abstract class EGLCore<Context, Surface, Display, Config> {
             }
             case EGLSurfaceConfig.SurfaceType.WINDOW_SURFACE: {
                 int[] surfaceAttribs = {
-                        EGL10.EGL_RENDER_BUFFER, EGL_BACK_BUFFER, EGL10.EGL_NONE
+                         EGL10.EGL_RENDER_BUFFER, EGL10.EGL_SINGLE_BUFFER, EGL10.EGL_NONE
+//                        EGL10.EGL_RENDER_BUFFER, EGL_BACK_BUFFER, EGL10.EGL_NONE
+//                        EGL10.EGL_NONE
                 };
                 Object nativeWindow = surfaceConfig.getNativeWindowForWindowSurface();
                 mEGLSurface = eglCreateWindowSurface(mEGLDisplay, mEGLConfig, nativeWindow, surfaceAttribs);
                 checkEGLError("CreateWindowSurface");
+                checkSurfaceSize();
                 break;
             }
         }
         if (!validEGLDisplay(mEGLDisplay)) {
             throw new RuntimeException("Unable to create an EGLSurface!");
         }
+    }
+
+    private void checkSurfaceSize() {
+        int[] value = new int[4];
+        eglQuerySurface(mEGLDisplay, mEGLSurface, EGL10.EGL_WIDTH, value, 0);
+        eglQuerySurface(mEGLDisplay, mEGLSurface, EGL10.EGL_HEIGHT, value, 1);
+        eglQuerySurface(mEGLDisplay, mEGLSurface, EGL10.EGL_RENDER_BUFFER, value, 2);
+        eglQuerySurface(mEGLDisplay, mEGLSurface, EGL10.EGL_WINDOW_BIT, value, 3);
+        Dog.d(TAG, "EGLSurfaceAttributes: " + Arrays.toString(value));
     }
 
     public void makeCurrent() {
@@ -252,13 +266,21 @@ public abstract class EGLCore<Context, Surface, Display, Config> {
 
     protected abstract void eglSwapBuffers(Display eglDisplay, Surface eglSurface);
 
+    protected abstract void eglQuerySurface(Display eglDisplay, Surface eglSurface, int attribute, int[] value, int offset);
+
     protected abstract void eglQueryContext(Display eglDisplay, Context eglContext, int attribute, int[] value);
 
     protected abstract void eglGetConfigAttrib(Display eglDisplay, Config eglConfig, int attribute, int[] value);
 
-    protected abstract Display eglGetCurrentDisplay();
+    public abstract Display eglGetCurrentDisplay();
 
-    protected abstract Context eglGetCurrentContext();
+    public abstract Context eglGetCurrentContext();
+
+    public abstract Surface eglGetCurrentDrawSurface();
+
+    public abstract Surface eglGetCurrentReadSurface();
+
+    public abstract void restoreState(Context context, Surface readSurface, Surface drawSurface, Display display);
 
     public final int getGLESVersion() {
         return mGLESVersion;

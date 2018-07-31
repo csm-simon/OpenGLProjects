@@ -1,5 +1,7 @@
 package com.demo.yujieliu.agorademo.egl;
 
+import java.util.Arrays;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -116,17 +118,39 @@ public class EGLCore10 extends EGLCore<EGLContext, EGLSurface, EGLDisplay, EGLCo
     }
 
     @Override
+    protected void eglQuerySurface(EGLDisplay eglDisplay, EGLSurface eglSurface, int attribute, int[] value, int offset) {
+        int[] subVal = new int[1];
+        mEgl.eglQuerySurface(eglDisplay, eglSurface, attribute, subVal);
+        value[offset] = subVal[0];
+    }
+
+    @Override
     protected void eglGetConfigAttrib(EGLDisplay eglDisplay, EGLConfig eglConfig, int attribute, int[] value) {
         mEgl.eglGetConfigAttrib(eglDisplay, eglConfig, attribute, value);
     }
 
     @Override
-    protected EGLDisplay eglGetCurrentDisplay() {
+    public EGLDisplay eglGetCurrentDisplay() {
         return mEgl.eglGetCurrentDisplay();
     }
 
     @Override
-    protected EGLContext eglGetCurrentContext() {
+    public EGLContext eglGetCurrentContext() {
         return mEgl.eglGetCurrentContext();
+    }
+
+    @Override
+    public EGLSurface eglGetCurrentDrawSurface() {
+        return mEgl.eglGetCurrentSurface(EGL10.EGL_DRAW);
+    }
+
+    @Override
+    public EGLSurface eglGetCurrentReadSurface() {
+        return mEgl.eglGetCurrentSurface(EGL10.EGL_READ);
+    }
+
+    @Override
+    public void restoreState(EGLContext context, EGLSurface readSurface, EGLSurface drawSurface, EGLDisplay display) {
+        mEgl.eglMakeCurrent(display, drawSurface, readSurface, context);
     }
 }

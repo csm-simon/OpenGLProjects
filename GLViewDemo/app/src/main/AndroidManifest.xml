@@ -18,6 +18,7 @@
         </activity>
         <activity android:name=".TextureActivity" android:screenOrientation="portrait" />
         <activity android:name=".GLSurfaceActivity" android:screenOrientation="portrait" />
+        <activity android:name=".OffscreenRenderActivity" android:screenOrientation="portrait" />
     </application>
 
 </manifest>

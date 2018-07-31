@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RadioButton radioButton = findViewById(R.id.radio_btn_gl_surface_view);
         if (radioButton.isChecked()) {
             Dog.d("MainActivity", "start GLSurfaceActivity");
-            startActivity(GLSurfaceActivity.create(this, glVersion));
+            startActivity(OffscreenRenderActivity.create(this, glVersion));
         } else {
             Dog.d("MainActivity", "start TextureActivity");
             startActivity(TextureActivity.create(this, glVersion));

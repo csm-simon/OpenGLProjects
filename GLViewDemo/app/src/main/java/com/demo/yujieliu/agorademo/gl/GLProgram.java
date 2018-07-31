@@ -156,6 +156,10 @@ public class GLProgram {
         return mTextureId;
     }
 
+    public void setTextureId(int texId) {
+        mTextureId = texId;
+    }
+
     /**
      * 释放纹理等资源，要在GL线程调用
      */

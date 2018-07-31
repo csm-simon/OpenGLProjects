@@ -29,6 +29,8 @@ class EGLCore14 extends EGLCore<EGLContext, EGLSurface, EGLDisplay, EGLConfig> {
 
     @Override
     protected void clearStuff() {
+        EGL14.eglReleaseThread();
+        EGL14.eglTerminate(mEGLDisplay);
         mEGLContext = EGL14.EGL_NO_CONTEXT;
         mEGLSurface = EGL14.EGL_NO_SURFACE;
         mEGLDisplay = EGL14.EGL_NO_DISPLAY;
@@ -55,12 +57,12 @@ class EGLCore14 extends EGLCore<EGLContext, EGLSurface, EGLDisplay, EGLConfig> {
     }
 
     @Override
-    protected EGLDisplay eglGetCurrentDisplay() {
+    public EGLDisplay eglGetCurrentDisplay() {
         return EGL14.eglGetCurrentDisplay();
     }
 
     @Override
-    protected EGLContext eglGetCurrentContext() {
+    public EGLContext eglGetCurrentContext() {
         return EGL14.eglGetCurrentContext();
     }
 
@@ -128,7 +130,27 @@ class EGLCore14 extends EGLCore<EGLContext, EGLSurface, EGLDisplay, EGLConfig> {
     }
 
     @Override
+    protected void eglQuerySurface(EGLDisplay eglDisplay, EGLSurface eglSurface, int attribute, int[] value, int offset) {
+        EGL14.eglQuerySurface(eglDisplay, eglSurface, attribute, value, offset);
+    }
+
+    @Override
     public void eglGetConfigAttrib(EGLDisplay eglDisplay, EGLConfig eglConfig, int attribute, int[] value) {
         EGL14.eglGetConfigAttrib(eglDisplay, eglConfig, attribute, value, 0);
+    }
+
+    @Override
+    public EGLSurface eglGetCurrentDrawSurface() {
+        return EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+    }
+
+    @Override
+    public EGLSurface eglGetCurrentReadSurface() {
+        return EGL14.eglGetCurrentSurface(EGL14.EGL_READ);
+    }
+
+    @Override
+    public void restoreState(EGLContext context, EGLSurface readSurface, EGLSurface drawSurface, EGLDisplay display) {
+        EGL14.eglMakeCurrent(display, drawSurface, readSurface, context);
     }
 }
