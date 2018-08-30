@@ -1,6 +1,7 @@
 package com.demo.yujieliu.agorademo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         findViewById(R.id.opengl_2_btn).setOnClickListener(this);
         findViewById(R.id.opengl_3_btn).setOnClickListener(this);
+        findViewById(R.id.fbo_offscreen_render_btn).setOnClickListener(this);
         requestPermission();
     }
 
@@ -57,6 +59,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 startDemo(3);
                 break;
+            case R.id.fbo_offscreen_render_btn:
+                startActivity(new Intent(this, FBOActivity.class));
+                break;
+            default:
+                break;
         }
     }
 
@@ -64,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RadioButton radioButton = findViewById(R.id.radio_btn_gl_surface_view);
         if (radioButton.isChecked()) {
             Dog.d("MainActivity", "start GLSurfaceActivity");
-            startActivity(OffscreenRenderActivity.create(this, glVersion));
+            startActivity(GLSurfaceActivity.create(this, glVersion));
         } else {
             Dog.d("MainActivity", "start TextureActivity");
             startActivity(TextureActivity.create(this, glVersion));
