@@ -46,6 +46,7 @@ public class FBOActivity extends AppCompatActivity {
         mGLSurfaceView.setEGLContextClientVersion(2);
         mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
         mRenderer = new Renderer();
+        mGLSurfaceView.setPreserveEGLContextOnPause(true);
         mGLSurfaceView.setRenderer(mRenderer);
         mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
@@ -53,6 +54,18 @@ public class FBOActivity extends AppCompatActivity {
     private void initData() {
         mVertexShader = OpenGLUtils.loadShaderInAssets("no_filter_vs.glsl", this);
         mFragmentShader = OpenGLUtils.loadShaderInAssets("no_filter_fs.glsl", this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGLSurfaceView.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGLSurfaceView.onPause();
     }
 
     @Override
