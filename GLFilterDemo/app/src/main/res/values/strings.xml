@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GLFilterDemo</string>
+
+    <string name="main_no_filter">原图</string>
+    <string name="main_contrast_filter">对比度滤镜</string>
+    <string name="main_gray_filter">黑白滤镜</string>
+    <string name="main_mosaic_filter">马赛克滤镜</string>
+    <string name="main_sepia_filter">怀旧滤镜</string>
+</resources>
